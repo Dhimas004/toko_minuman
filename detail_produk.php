@@ -80,12 +80,30 @@ $minimal_pemesanan = $row['minimal_pemesanan'];
 				</table>
 				<?php
 				if (isset($_SESSION['user'])) {
+					$qty_keranjang = 0;
+					$list_keranjang = mysqli_query($conn, "SELECT * FROM keranjang");
+					while ($data = mysqli_fetch_assoc($list_keranjang)) {
+						$qty_keranjang += $data['qty'];
+					}
+					$maksimal_pemesanan = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM maksimal_pemesanan WHERE id = '1'"))['maksimal_pemesanan'];
+					if ($qty_keranjang >= $maksimal_pemesanan) {
 				?>
-					<button type="submit" class="btn btn-success">Booking</button>
-				<?php
+						<button type="button" class="btn btn-success disabled">Full Booking</button>
+						<?php
+					} else {
+						if ($qty_keranjang + $minimal_pemesanan >= $maksimal_pemesanan) {
+						?>
+							<button type="button" class="btn btn-success disabled">Full Booking</button>
+						<?php
+						} else {
+						?>
+							<button type="submit" class="btn btn-success">Booking</button>
+					<?php
+						}
+					}
 				} else {
 
-				?>
+					?>
 					<a href="keranjang.php" class="btn btn-success">Booking</a>
 				<?php
 				}
@@ -103,6 +121,7 @@ $minimal_pemesanan = $row['minimal_pemesanan'];
 		$pemesanan_hari_ini += $data['qty'];
 	}
 	$maksimal_pemesanan -= $pemesanan_hari_ini;
+	$maksimal_pemesanan -= $qty_keranjang;
 	?>
 	<input type="hidden" id="maksimal_pemesanan" value="<?= $maksimal_pemesanan ?>">
 	<script>
@@ -121,6 +140,7 @@ $minimal_pemesanan = $row['minimal_pemesanan'];
 					return false;
 				}
 			})
+
 		})
 
 		function formatRupiah(amount) {
