@@ -74,6 +74,7 @@ if (isset($_POST['checkout'])) {
 						$no = 1;
 						$hasil = 0;
 						while ($row = mysqli_fetch_assoc($result)) {
+							$keranjang = $row['keranjang'];
 							$id_varian_rasa_produk = $row['id_varian_rasa_produk'];
 							$minimal_pemesanan = $row['minimal_pemesanan'];
 							$id_varian_ukuran_produk = $row['id_varian_ukuran_produk'];
@@ -95,7 +96,7 @@ if (isset($_POST['checkout'])) {
 									<td><?= $ukuran ?></td>
 									<td align="right">Rp. <?= number_format($row['hrg'], 0, ',', '.');  ?></td>
 									<td>
-										<input type="number" name="qty[]" class="form-control qty" style="text-align: center;" value="<?= $row['jml']; ?>" data-id="<?= $no ?>" data-harga=<?= $row['hrg'] ?> min="<?= $minimal_pemesanan ?>">
+										<input type="number" name="qty[]" class="form-control qty" style="text-align: center;" value="<?= $row['jml']; ?>" data-id="<?= $no ?>" data-harga=<?= $row['hrg'] ?> min="<?= $minimal_pemesanan ?>" data-id-keranjang="<?= $keranjang ?>">
 									</td>
 									<td align="right">Rp. <span id="harga-<?= $no ?>"><?= number_format($row['hrg'] * $row['jml'], 0, ',', '.');  ?></span></td>
 									<td align="center">
@@ -151,6 +152,7 @@ if (isset($_POST['checkout'])) {
 	$(document).ready(function() {
 
 		$('.qty').change(function() {
+			let id_keranjang = $(this).attr('data-id-keranjang');
 			let maksimal_pemesanan = $('#maksimal_pemesanan').val();
 			let data_id = $(this).attr('data-id');
 			let harga = $(this).attr('data-harga');
@@ -159,14 +161,26 @@ if (isset($_POST['checkout'])) {
 				alert('Pemesanan Hari Ini Sudah Mencapai Batas Maksimal Pemesanan');
 				if ((qty - 1) > maksimal_pemesanan) {
 					$(this).val(maksimal_pemesanan);
+					$.post('ajax/ajax_keranjang.php', {
+						qty: maksimal_pemesanan,
+						id_keranjang
+					})
 				} else {
 					$(this).val(qty - 1);
+					$.post('ajax/ajax_keranjang.php', {
+						qty: (qty - 1),
+						id_keranjang
+					})
 				}
 				let total = qty * harga;
 				$(`#harga-${data_id}`).text(formatRupiah(total));
 				sumGrandtotal();
 				return false;
 			}
+			$.post('ajax/ajax_keranjang.php', {
+				qty,
+				id_keranjang,
+			})
 			let total = qty * harga;
 			$(`#harga-${data_id}`).text(formatRupiah(total));
 			sumGrandtotal();
