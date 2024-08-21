@@ -77,7 +77,10 @@ include 'header.php';
 								<?php
 							} else if ($row['tolak'] == 1) {
 								?>
-								<td style="color: red;font-weight: bold;">Pesanan Ditolak
+								<td>
+									<span style="color: red;font-weight: bold;">Pesanan Ditolak</span>
+									<br />
+									<small>(<?= $row['alasan_dll'] ?>)</small>
 								<?php
 							}
 							if ($row['terima'] == 0 && $row['tolak'] == 0) {
@@ -173,7 +176,7 @@ include 'header.php';
 														Dll
 													</label>
 												</div>
-												<div id="div-dll-<?= $no ?>" style="display: none;">
+												<div>
 													<div class="form-group">
 														<label for="form_dll">Alasan</label>
 														<textarea class="form-control" id="form_dll" name="form_dll" rows="3"></textarea>

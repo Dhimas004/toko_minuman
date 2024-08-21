@@ -3,7 +3,7 @@ include '../../koneksi/koneksi.php';
 $inv = $_GET['inv'];
 $page = $_GET['page'];
 $alasan_penolakan = $_GET['alasan_penolakan'];
-$tolak = mysqli_query($conn, "UPDATE `order` set tolak = '1', alasan_penolakan = '$alasan_penolakan' WHERE invoice = '$inv'");
+$tolak = mysqli_query($conn, "UPDATE `order` set tolak = '1', alasan_penolakan = '$alasan_penolakan',alasan_dll = '$alasan_penolakan' WHERE invoice = '$inv'");
 
 
 if ($tolak) {

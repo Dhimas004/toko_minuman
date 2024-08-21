@@ -62,8 +62,7 @@ include 'header.php';
 						<td>
 							<span style="color: red;font-weight: bold;">Pesanan Ditolak</span>
 							<br />
-							<small>(<?= $row['alasan_penolakan'] ?>)</small>
-
+							<small>(<?= $row['alasan_dll'] ?>)</small>
 						<?php
 					}
 					if ($row['terima'] == 0 && $row['tolak'] == 0) {
@@ -88,8 +87,8 @@ include 'header.php';
 									<?php
 									else :
 									?>
-										<a href="proses/terima.php?inv=<?= $row['invoice']; ?>&kdp=<?= $row['kode_produk']; ?>&page=order_tunai" class="btn btn-sm btn-success mt-2"><i class="glyphicon glyphicon-ok-sign"></i> Terima</a>
-										<a href="proses/tolak.php?inv=<?= $row['invoice']; ?>&page=order_tunai" class="btn btn-sm btn-danger mt-2" onclick="return confirm('Yakin Ingin Menolak ?')"><i class="glyphicon glyphicon-remove-sign"></i> Tolak</a>
+										<a href="proses/terima.php?inv=<?= $row['invoice']; ?>&kdp=<?= $row['kode_produk']; ?>" class="btn btn-sm btn-success mt-2"><i class="glyphicon glyphicon-ok-sign"></i> Terima</a>
+										<a href="#" class="btn btn-sm btn-danger mt-2" data-toggle="modal" data-target="#modal-penolakan-<?= $id_order ?>"><i class="glyphicon glyphicon-remove-sign"></i> Tolak</a>
 									<?php
 									endif;
 								elseif ($row['terima'] == 1) :
@@ -149,7 +148,7 @@ include 'header.php';
 			<div class="modal-dialog modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
-						<a href="m_produk.php" class="btn btn-sm btn-default close"></a>
+						<a href="order.php" class="btn btn-sm btn-default close"></a>
 						<h4 class="modal-title" id="myModalLabel">#<?= $row['invoice']; ?></h4>
 					</div>
 					<div class="modal-body">
@@ -232,6 +231,27 @@ include 'header.php';
 			</div>
 		</div>
 
+		<div class="modal fade" id="modal-penolakan-<?= $id_order ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<a href="order.php" class="btn btn-sm btn-default close"></a>
+						<h4 class="modal-title" id="myModalLabel">#<?= $row['invoice']; ?></h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="form_dll">Alasan</label>
+							<textarea class="form-control form_dll" id="form_dll" name="form_dll" rows="3"></textarea>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+						<a id="btn-tolak" href="proses/tolak.php?inv=<?= $invoices; ?>" data-href="proses/tolak.php?inv=<?= $invoices; ?>" class="btn btn-sm btn-danger mt-2" onclick="return confirm('Yakin Ingin Menolak ?')"><i class="glyphicon glyphicon-remove-sign"></i> Tolak</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
 		<!-- Modal Bukti Pembayaran -->
 		<div class="modal fade" id="modal-bukti-pembayaran-<?= $id_order ?>" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
 			<div class="modal-dialog modal-sm" role="document">
@@ -260,6 +280,14 @@ include 'header.php';
 			let alasan_penolakan = $(this).val();
 			let invoice = $(this).attr('data-invoice');
 			$(`.btn-tolak-verifikasi[data-invoice='${invoice}']`).attr('href', `proses/tolak.php?inv=${invoice}&alasan_penolakan=${alasan_penolakan}`);
+		})
+
+		$('.form_dll').keyup(function() {
+			let alasan_penolakan = $(this).val();
+			let btn_tolak = $(this).parent().parent().parent().find('#btn-tolak');
+			let href = btn_tolak.attr('data-href');
+			let new_href = href + "&alasan_penolakan=" + alasan_penolakan;
+			btn_tolak.attr('href', new_href);
 		})
 	})
 </script>

@@ -128,7 +128,7 @@ $array_quantity_penolakan2 = [];
 $list_penolakan = mysqli_query($conn, "SELECT * FROM `order` WHERE MONTH(tanggal) = '$bulan' AND YEAR(tanggal) = '$tahun' AND tolak = '1' GROUP BY invoice");
 while ($data = mysqli_fetch_assoc($list_penolakan)) {
 	$alasan_penolakan = $data['alasan_penolakan'];
-	if ($alasan_penolakan == 'dll') $alasan_penolakan = $data['alasan_dll'];
+	// if ($alasan_penolakan == 'dll') $alasan_penolakan = $data['alasan_dll'];
 	$array_penolakan[$alasan_penolakan] += 1;
 }
 
