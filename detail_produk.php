@@ -91,7 +91,7 @@ $minimal_pemesanan = $row['minimal_pemesanan'];
 						<button type="button" class="btn btn-success disabled">Full Booking</button>
 						<?php
 					} else {
-						if ($qty_keranjang + $minimal_pemesanan >= $maksimal_pemesanan) {
+						if ($qty_keranjang + $minimal_pemesanan > $maksimal_pemesanan) {
 						?>
 							<button type="button" class="btn btn-success disabled">Full Booking</button>
 						<?php
