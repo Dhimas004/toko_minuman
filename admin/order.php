@@ -13,7 +13,7 @@ include 'header.php';
 	}
 </style>
 <div class="container">
-	<h2 style=" width: 100%; border-bottom: 4px solid gray"><b>Daftar Pesanan (Non Tunai)</b></h2>
+	<h2 style=" width: 100%; border-bottom: 4px solid gray"><b>Daftar Pesanan</b></h2>
 	<br>
 	<h5 class="bg-success" style="padding: 7px; width: 100%; font-weight: bold;">
 		<marquee>Lakukan Reload Setiap Masuk Halaman ini, untuk menghindari terjadinya kesalahan data dan informasi</marquee>
