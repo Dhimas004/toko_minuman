@@ -14,7 +14,7 @@ $rows = mysqli_fetch_assoc($cs);
 <div class="container" style="padding-bottom: 200px">
 	<h2 style=" width: 100%; border-bottom: 4px solid #ff8680"><b>Checkout</b></h2>
 	<div class="row">
-		<div class="col-md-6">
+		<div class="col-md-8">
 			<h4>Daftar Pesanan</h4>
 			<table class="table table-stripped">
 				<tr>
@@ -31,6 +31,7 @@ $rows = mysqli_fetch_assoc($cs);
 				$no = 1;
 				$hasil = 0;
 				while ($row = mysqli_fetch_assoc($result)) {
+					$keranjang = $row['id_keranjang'];
 					$id_varian_rasa_produk = $row['id_varian_rasa_produk'];
 					$id_varian_ukuran_produk = $row['id_varian_ukuran_produk'];
 
@@ -42,7 +43,17 @@ $rows = mysqli_fetch_assoc($cs);
 					<tr>
 						<td align="center"><?= $no; ?></td>
 						<td><?= $row['nama_produk']; ?></td>
-						<td><?= $rasa ?></td>
+						<td><?php
+							if ($id_varian_rasa_produk == 10) {
+								$list_custom_rasa = mysqli_query($conn, "SELECT * FROM custom_rasa WHERE id_keranjang = '$keranjang'");
+								while ($row2 = mysqli_fetch_assoc($list_custom_rasa)) {
+									$rasa2 = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM varian_rasa_produk WHERE id = '$row2[varian_rasa_produk_id]'"))['rasa'];
+									echo $rasa2 . " (" . $row2['qty'] . ")<br />";
+								}
+							} else {
+								echo $rasa;
+							}
+							?></td>
 						<td><?= $ukuran ?></td>
 						<td align="right">Rp. <?= number_format($row['harga'], 0, ',', '.'); ?></td>
 						<td align="center"><?= $row['qty']; ?></td>
@@ -100,7 +111,15 @@ $rows = mysqli_fetch_assoc($cs);
 					</select>
 				</div>
 				<ul style="padding: 0; margin-left: 3%; display: none;" id="bank">
-					<li>BRI (0838-01-046709-53-2) a/n Suparjo</li>
+					<?php
+					$list_metode_pembayaran = mysqli_query($conn, "SELECT * FROM metode_pembayaran");
+					while ($row = mysqli_fetch_assoc($list_metode_pembayaran)) {
+						$layanan = $row['layanan'];
+						$nomor = $row['nomor'];
+						$atas_nama = $row['atas_nama'];
+						echo "<li>$layanan ($nomor) a/n " . ucwords(strtolower($atas_nama)) . "</li>";
+					}
+					?>
 				</ul>
 			</div>
 			<div class="col-md-6">

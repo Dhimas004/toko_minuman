@@ -92,7 +92,17 @@ if (isset($_POST['checkout'])) {
 									<td scope="row" align="center" style="width: 5%;"><?= $no;  ?></td>
 									<td><img src="image/produk/<?= $row['gambar']; ?>" width="100"></td>
 									<td><?= $row['nama']; ?></td>
-									<td><?= $rasa ?></td>
+									<td><?php
+										if ($id_varian_rasa_produk == 10) {
+											$list_custom_rasa = mysqli_query($conn, "SELECT * FROM custom_rasa WHERE id_keranjang = '$keranjang'");
+											while ($row2 = mysqli_fetch_assoc($list_custom_rasa)) {
+												$rasa2 = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM varian_rasa_produk WHERE id = '$row2[varian_rasa_produk_id]'"))['rasa'];
+												echo $rasa2 . " (" . $row2['qty'] . ")<br />";
+											}
+										} else {
+											echo $rasa;
+										}
+										?></td>
 									<td><?= $ukuran ?></td>
 									<td align="right">Rp. <?= number_format($row['hrg'], 0, ',', '.');  ?></td>
 									<td>

@@ -5,9 +5,11 @@ $result = mysqli_query($conn, "SELECT * FROM produk WHERE kode_produk = '$kode'"
 $row = mysqli_fetch_assoc($result);
 $harga = $row['harga'];
 $minimal_pemesanan = $row['minimal_pemesanan'];
+$custom_rasa = $row['custom_rasa'];
 
 ?>
 <div class="container">
+	<input type="hidden" id="kode_customer" value="<?= $_SESSION['kd_cs'] ?>">
 	<h2 style=" width: 100%; border-bottom: 4px solid #ff8680"><b>Detail produk</b></h2>
 
 	<div class="row">
@@ -22,7 +24,7 @@ $minimal_pemesanan = $row['minimal_pemesanan'];
 		<div class="col-md-8">
 			<form action="proses/add.php" method="GET">
 				<input type="hidden" name="kd_cs" value="<?= $kode_cs; ?>">
-				<input type="hidden" name="produk" value="<?= $kode;  ?>">
+				<input type="hidden" name="produk" id="produk" value="<?= $kode;  ?>">
 				<input type="hidden" name="hal" value="2">
 				<table class="table table-striped">
 					<tbody>
@@ -43,16 +45,66 @@ $minimal_pemesanan = $row['minimal_pemesanan'];
 						?>
 						<tr style="display: <?= (mysqli_num_rows($varian_rasa) == 0  ? 'none' : '') ?>">
 							<td><b>Rasa</b></td>
-							<td>
-								<select class=" form-control" id="id_varian_rasa_produk" name="id_varian_rasa_produk" style="width: 155px;">
-									<option value="">-- Pilih --</option>
-									<?php
 
-									while ($row = mysqli_fetch_assoc($varian_rasa)) {
-										echo "<option value='$row[id]'>$row[rasa]</option>";
-									}
-									?>
-								</select>
+							<td>
+								<div style="display: inline-block;">
+									<select class=" form-control" id="id_varian_rasa_produk" name="id_varian_rasa_produk" style="width: 155px;">
+										<option value="">-- Pilih --</option>
+										<?php
+
+										while ($row = mysqli_fetch_assoc($varian_rasa)) {
+											echo "<option value='$row[id]'>$row[rasa]</option>";
+										}
+										?>
+									</select>
+								</div>
+
+								<?php
+								if ($custom_rasa == '1') {
+								?>
+									<a href="#" style="display: inline-block; margin-left: 10px;" data-toggle="modal" data-target="#modal-custom-rasa">Custom Rasa</a>
+								<?php
+								}
+								?>
+
+								<!-- Modal -->
+								<div class="modal fade" id="modal-custom-rasa" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+									<div class="modal-dialog">
+										<div class="modal-content">
+											<div class="modal-header">
+												<h5 class="modal-title" id="exampleModalLabel">Custom Rasa</h5>
+												<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+													<span aria-hidden="true">&times;</span>
+												</button>
+											</div>
+											<div class="modal-body">
+												<table class="table table-bordered table-hover">
+													<thead>
+														<tr class="text-center">
+															<th>Rasa</th>
+															<th>Quantity</th>
+														</tr>
+													</thead>
+													<?php
+													$list_varian_rasa = mysqli_query($conn, "SELECT id,rasa FROM varian_rasa_produk WHERE kode_produk = '$_GET[produk]'");
+													while ($row = mysqli_fetch_assoc($list_varian_rasa)) {
+													?>
+														<tr>
+															<td><?= $row['rasa'] ?></td>
+															<td><input type="number" class="form-control custom_rasa" data-id="<?= $row['id'] ?>" value="0"></td>
+														</tr>
+													<?php
+													}
+													?>
+												</table>
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+												<button type="button" class="btn btn-success" id="btn-simpan-custom-rasa" data-dismiss="modal">Simpan Rasa</button>
+											</div>
+										</div>
+									</div>
+								</div>
 							</td>
 						</tr>
 
@@ -73,7 +125,7 @@ $minimal_pemesanan = $row['minimal_pemesanan'];
 						<tr>
 							<td><b>Jumlah</b></td>
 							<td>
-								<input class="form-control qty" type="number" min="<?= $minimal_pemesanan ?>" name="jml" value="<?= $minimal_pemesanan ?>" style="width: 155px;">
+								<input class="form-control qty" id="qty" type="number" min="<?= $minimal_pemesanan ?>" name="jml" value="<?= $minimal_pemesanan ?>" style="width: 155px;">
 							</td>
 						</tr>
 					</tbody>
@@ -131,6 +183,10 @@ $minimal_pemesanan = $row['minimal_pemesanan'];
 				$('#harga').text(formatRupiah(harga));
 			})
 
+			$('#id_varian_rasa_produk').change(function() {
+				changeCustomRasa();
+			})
+
 			$('.qty').change(function() {
 				let maksimal_pemesanan = $('#maksimal_pemesanan').val();
 				let qty = $(this).val();
@@ -139,9 +195,60 @@ $minimal_pemesanan = $row['minimal_pemesanan'];
 					$(this).val(qty - 1);
 					return false;
 				}
+				changeCustomRasa();
+			})
+
+			$('.custom_rasa').change(function() {
+				let max_qty = $('#qty').val();
+				let total_qty = 0;
+				$('.custom_rasa').each(function() {
+					qty = parseInt($(this).val());
+					if ((total_qty + qty) > max_qty) {
+						alert('Quantity Tidak Sesuai');
+						$(this).val(max_qty - total_qty);
+						return false;
+					} else {
+						total_qty += qty;
+					}
+				})
+			})
+
+			$('#btn-simpan-custom-rasa').click(function() {
+				let kode_customer = $('#kode_customer').val();
+				let id_produk = $('#produk').val();
+				let array_rasa = [];
+				if (kode_customer != '') {
+					$('.custom_rasa').each(function() {
+						let id = $(this).attr('data-id');
+						let value = parseInt($(this).val());
+						array_rasa.push({
+							id,
+							qty: value
+						})
+					})
+					array_rasa = JSON.stringify(array_rasa);
+
+					$.post('ajax/ajax_custom_rasa.php', {
+						array_rasa,
+						kode_produk: id_produk
+					}, function(res) {
+						console.log(res);
+						$('#id_varian_rasa_produk').val(10);
+					})
+				}
+
 			})
 
 		})
+
+		function changeCustomRasa() {
+			let id_varian_rasa_produk = $('#id_varian_rasa_produk').val();
+			let qty = $('#qty').val();
+			if (qty > 0 && id_varian_rasa_produk != '') {
+				$(`.custom_rasa[data-id="${id_varian_rasa_produk}"]`).val(qty);
+			}
+
+		}
 
 		function formatRupiah(amount) {
 			const formatted = new Intl.NumberFormat('id-ID', {

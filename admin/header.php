@@ -73,6 +73,7 @@ function tgl_indo($tanggal)
 						<ul class="dropdown-menu">
 							<li><a href="m_produk.php">Master Produk</a></li>
 							<li><a href="m_customer.php">Master Customer</a></li>
+							<li><a href="m_metode_pembayaran.php">Master Metode Pembayaran</a></li>
 						</ul>
 					</li>
 

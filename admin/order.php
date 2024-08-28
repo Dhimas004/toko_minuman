@@ -197,6 +197,7 @@ include 'header.php';
 							$no = 1;
 							$grand = 0;
 							while ($list = mysqli_fetch_assoc($order)) :
+								$id_order = $list['id_order'];
 								$id_varian_rasa_produk = $list['id_varian_rasa_produk'];
 								$id_varian_ukuran_produk = $list['id_varian_ukuran_produk'];
 								$rasa = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM varian_rasa_produk WHERE id = '$id_varian_rasa_produk'"))['rasa'];
@@ -207,7 +208,17 @@ include 'header.php';
 									<td><?= $no;  ?></td>
 									<td><?= $list['kode_produk']; ?></td>
 									<td><?= $list['nama_produk']; ?></td>
-									<td><?= $rasa; ?></td>
+									<td><?php
+										if ($id_varian_rasa_produk == 10) {
+											$list_custom_rasa = mysqli_query($conn, "SELECT * FROM custom_rasa WHERE id_order = '$id_order'");
+											while ($row2 = mysqli_fetch_assoc($list_custom_rasa)) {
+												$rasa2 = mysqli_fetch_assoc(mysqli_query($conn, "SELECT * FROM varian_rasa_produk WHERE id = '$row2[varian_rasa_produk_id]'"))['rasa'];
+												echo $rasa2 . " (" . $row2['qty'] . ")<br />";
+											}
+										} else {
+											echo $rasa;
+										}
+										?></td>
 									<td><?= $ukuran; ?></td>
 									<td>Rp. <?= number_format($list['harga'], 0, ",", ".");  ?></td>
 									<td><?= $list['qty'];  ?></td>

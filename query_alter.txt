@@ -1,0 +1,10 @@
+Alter table `toko_minuman`.`produk`   
+	add column `custom_rasa` int(1) NOT NULL after `harga`;
+Create table `toko_minuman`.`custom_rasa` (  
+  `id` int NOT NULL AUTO_INCREMENT,
+  `kode_customer` varchar(20) NOT NULL,
+  `varian_rasa_produk_id` int NOT NULL,
+  `kode_produk` varchar(20) NOT NULL,
+  `qty` int NOT NULL,
+  primary key (`id`)
+)

@@ -32,6 +32,10 @@ if (strlen($add) == 1) {
 
 $keranjang = mysqli_query($conn, "SELECT * FROM keranjang WHERE kode_customer = '$kd_cs'");
 while ($row = mysqli_fetch_assoc($keranjang)) {
+	$id_order = mysqli_fetch_assoc(mysqli_query($conn, "SELECT `AUTO_INCREMENT`
+	FROM  INFORMATION_SCHEMA.TABLES
+	WHERE TABLE_SCHEMA = DATABASE()
+	AND   TABLE_NAME   = 'order'"))['AUTO_INCREMENT'];
 	$id_varian_rasa_produk = $row['id_varian_rasa_produk'];
 	$id_varian_ukuran_produk = $row['id_varian_ukuran_produk'];
 	$kd_produk = $row['kode_produk'];
@@ -41,7 +45,11 @@ while ($row = mysqli_fetch_assoc($keranjang)) {
 	$status = "Pesanan Baru";
 
 	// if ($metode_pembayaran == 'non_tunai') {
-	$order2 = mysqli_query($conn, "INSERT INTO `order` VALUES('','$id_varian_rasa_produk','$id_varian_ukuran_produk','$format','$kd_cs','$kd_produk','$nama_produk','$qty','$harga','$status','$metode_pembayaran','$new_bukti_pembayaran','$tanggal','$tanggal_pengambilan','$prov','$kota','$alamat','$kopos','0','0','','','0','$catatan_khusus')");
+	$order2 = mysqli_query($conn, "INSERT INTO `order` VALUES('$id_order','$id_varian_rasa_produk','$id_varian_ukuran_produk','$format','$kd_cs','$kd_produk','$nama_produk','$qty','$harga','$status','$metode_pembayaran','$new_bukti_pembayaran','$tanggal','$tanggal_pengambilan','$prov','$kota','$alamat','$kopos','0','0','','','0','$catatan_khusus')");
+
+	if ($id_varian_rasa_produk == 10) {
+		mysqli_query($conn, "UPDATE custom_rasa SET id_order = '$id_order' WHERE id_keranjang = '$row[id_keranjang]'");
+	}
 	// } else {
 	// 	$order2 = mysqli_query($conn, "INSERT INTO `order` VALUES('','$id_varian_rasa_produk','$id_varian_ukuran_produk','$format','$kd_cs','$kd_produk','$nama_produk','$qty','$harga','$status','$metode_pembayaran','$new_bukti_pembayaran','$tanggal','$tanggal_pengambilan','$prov','$kota','$alamat','$kopos','1','','','0','0','$catatan_khusus')");
 	// }
